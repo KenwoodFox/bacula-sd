@@ -12,8 +12,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Create bacula user and group
-RUN useradd -r -m -s /usr/sbin/nologin bacula && \
-    mkdir -p /etc/bacula /var/lib/bacula /var/log/bacula && \
+RUN mkdir -p /etc/bacula /var/lib/bacula /var/log/bacula && \
     chown -R bacula:bacula /etc/bacula /var/lib/bacula /var/log/bacula
 
 # Copy default bacula-sd.conf

@@ -49,11 +49,19 @@ jobs:
         id: branch-name
         uses: tj-actions/branch-names@v5.2
 
-      - name: Get a docker ready tag
+      - name: Get a Docker-ready tag
+        id: docker-tag
         run: |
-          echo "${{ steps.branch-name.outputs.current_branch }}"
-          echo "${{ steps.meta.outputs.tags }}"
-          echo "CUSTOM_TAG=ghcr.io/KenwoodFox/bacula-sd:$(echo "${{ steps.branch-name.outputs.current_branch }}" | sed 's/[^a-zA-Z0-9]/-/g; s/[A-Z]/\L&/g')" >> $GITHUB_ENV
+          # Get lowercase repo and actor names
+          REPO_NAME=$(echo "${{ github.repository }}" | awk -F'/' '{print tolower($2)}')
+          ACTOR_NAME=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')
+          BRANCH_NAME=$(echo "${{ steps.branch-name.outputs.current_branch }}" | sed 's/[^a-zA-Z0-9]/-/g; s/[A-Z]/\L&/g')
+
+          # Build Docker tag
+          echo "CUSTOM_TAG=${{ env.REGISTRY }}/${ACTOR_NAME}/${REPO_NAME}:${BRANCH_NAME}" >> $GITHUB_ENV
+
+          # Debug output
+          echo "Generated Tag: ${{ env.CUSTOM_TAG }}"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
